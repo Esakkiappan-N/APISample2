@@ -42,6 +42,9 @@ def page(request):
             headless=True,
             args=["--no-sandbox","--disable-dev-shm-usage","--disable-gpu"]
         )
+           context = browser.new_context(
+            viewport={"width": 1920, "height": 1080}
+        )
 
         context = browser.new_context(viewport={"width": 1920, "height": 1080})
         context.tracing.start(
@@ -49,9 +52,7 @@ def page(request):
             snapshots=True,
             sources=True
         )
-        context = browser.new_context(
-            viewport={"width": 1920, "height": 1080}
-        )
+     
         page = context.new_page()
         page.goto(BASE_URL)
 
