@@ -89,4 +89,4 @@ jobs:
     # =========================
     - name: Run Mobile Tests
       run: |
-        pytest tests/mobile --alluredir=allure-results
+        pytest test_framework/tests/mobile --alluredir=allure-results
