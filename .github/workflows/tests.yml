@@ -1,4 +1,4 @@
-name: Full Test Automation (API + Web + Mobile)
+name: Full Test Automation (API + Web + Mobile - Real Device)
 
 on:
   push:
@@ -7,60 +7,41 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # ✅ IMPORTANT (not ubuntu-latest)
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    # ================= PYTHON SETUP =================
 
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.13'
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: |
         pip install -r test_framework/requirements.txt
-        pip install playwright
+        pip install playwright pytest allure-pytest
 
     - name: Install Playwright Browsers
       run: |
         python -m playwright install --with-deps
 
-    # ✅ FIXED: Web + API
+    # ================= API + WEB =================
+
     - name: Run API & Web Tests
       run: |
         pytest test_framework/tests/api test_framework/tests/web --alluredir=allure-results
 
-    # ================= MOBILE =================
+    # ================= MOBILE SETUP =================
 
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Create Emulator
+    - name: Check connected devices
       run: |
-        sdkmanager "system-images;android-30;google_apis;x86_64"
-        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
-
-    # ✅ FIXED: Boot wait
-    - name: Start Emulator
-      run: |
-        nohup emulator -avd test -no-window -no-audio -no-boot-anim &
-        adb wait-for-device
-        echo "Waiting for emulator..."
-        until adb shell getprop sys.boot_completed | grep "1"; do
-          sleep 5
-        done
-        adb shell input keyevent 82
         adb devices
 
-    - name: Setup Node
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
@@ -70,12 +51,13 @@ jobs:
         npm install -g appium
         appium driver install uiautomator2
 
-    # ✅ FIXED: wait added
     - name: Start Appium Server
       run: |
-        nohup appium &
+        nohup appium --log-level info &
         sleep 15
 
-    - name: Run Mobile Tests
+    # ================= MOBILE TEST =================
+
+    - name: Run Mobile Tests (Real Device)
       run: |
         pytest test_framework/tests/mobile --alluredir=allure-results
