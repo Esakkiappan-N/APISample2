@@ -1,4 +1,4 @@
-name: Full Test Automation (API + Web + Mobile - Real Device)
+name: Full Test Automation (API + Web + Mobile)
 
 on:
   push:
@@ -7,72 +7,75 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted   # ✅ Must be your local machine
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # ================= PYTHON =================
-
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.12'
+        python-version: '3.13'
 
-    - name: Install Python dependencies
+    - name: Install dependencies
       run: |
         pip install -r test_framework/requirements.txt
-        pip install playwright pytest allure-pytest
+        pip install playwright
 
     - name: Install Playwright Browsers
       run: |
-        python -m playwright install
+        python -m playwright install --with-deps
 
-    # ================= API + WEB =================
-
+    # ✅ FIXED: Web + API
     - name: Run API & Web Tests
       run: |
         pytest test_framework/tests/api test_framework/tests/web --alluredir=allure-results
 
-    # ================= MOBILE SETUP =================
+    # ================= MOBILE =================
 
-    # ✅ Add platform-tools to PATH
-    - name: Add ADB to PATH
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Create Emulator
       run: |
-        echo "${{ github.workspace }}/platform-tools" >> $GITHUB_PATH
+        sdkmanager "system-images;android-30;google_apis;x86_64"
+        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
-    - name: Check ADB Version
-      run: adb version
-
-    - name: Check connected devices
+    # ✅ FIXED: Boot wait
+    - name: Start Emulator
       run: |
-        adb kill-server
-        adb start-server
+        nohup emulator -avd test -no-window -no-audio -no-boot-anim &
+        adb wait-for-device
+        echo "Waiting for emulator..."
+        until adb shell getprop sys.boot_completed | grep "1"; do
+          sleep 5
+        done
+        adb shell input keyevent 82
         adb devices
 
-    # ================= NODE + APPIUM =================
-
-    - name: Setup Node.js
+    - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: '20'
 
-    - name: Install Appium & Driver
+    - name: Install Appium
       run: |
         npm install -g appium
         appium driver install uiautomator2
-        appium driver list --installed
 
-    # ================= START APPIUM =================
-
+    # ✅ FIXED: wait added
     - name: Start Appium Server
       run: |
-        nohup appium --log-level info &
-        sleep 20
+        nohup appium &
+        sleep 15
 
-    # ================= MOBILE TEST =================
-
-    - name: Run Mobile Tests (Real Device)
+    - name: Run Mobile Tests
       run: |
         pytest test_framework/tests/mobile --alluredir=allure-results
