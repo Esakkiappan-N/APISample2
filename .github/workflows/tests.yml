@@ -1,4 +1,4 @@
-name: Full Test Automation (Fast)
+name: Full Test Automation (API + Web + Mobile)
 
 on:
   push:
@@ -6,75 +6,87 @@ on:
   pull_request:
 
 jobs:
-
-  # ================= API =================
-  api-tests:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    # =========================
+    # ✅ 1. CHECKOUT CODE
+    # =========================
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - uses: actions/setup-python@v4
+    # =========================
+    # ✅ 2. PYTHON SETUP
+    # =========================
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.13'
+        python-version: '3.11'
 
-    - name: Install deps
-      run: pip install -r test_framework/requirements.txt
-
-    - name: Run API tests
-      run: pytest test_framework/tests/api
-
-  # ================= WEB =================
-  web-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.13'
-
-    - name: Install deps
+    # =========================
+    # ✅ 3. INSTALL DEPENDENCIES
+    # =========================
+    - name: Install dependencies
       run: |
         pip install -r test_framework/requirements.txt
         pip install playwright
+
+    # =========================
+    # ✅ 4. INSTALL PLAYWRIGHT
+    # =========================
+    - name: Install Playwright Browsers
+      run: |
         python -m playwright install --with-deps
 
-    - name: Run Web tests
-      run: pytest test_framework/tests/web
+    # =========================
+    # ✅ 5. RUN API + WEB TESTS
+    # =========================
+    - name: Run API & Web Tests
+      run: |
+        pytest test_framework/tests/api test_framework/tests/web --alluredir=allure-results
 
-  # ================= MOBILE =================
-  mobile-tests:
-    runs-on: ubuntu-latest
+    # =========================
+    # 📱 MOBILE SETUP STARTS
+    # =========================
 
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.13'
-
-    - name: Install deps
-      run: pip install -r test_framework/requirements.txt
-
-    - uses: actions/setup-java@v3
+    # ✅ 6. JAVA (REQUIRED)
+    - name: Setup Java
+      uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - uses: android-actions/setup-android@v3
+    # ✅ 7. ANDROID SDK
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-    - name: Create & Start Emulator
+    # ✅ 8. INSTALL REQUIRED SDK TOOLS (FIXED)
+    - name: Install Android SDK Components
       run: |
-        sdkmanager "system-images;android-30;google_apis;x86_64"
+        yes | sdkmanager --licenses
+        sdkmanager --install "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
+
+    # ✅ 9. CREATE EMULATOR
+    - name: Create Emulator
+      run: |
         echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
-        nohup emulator -avd test -no-window -no-audio -no-boot-anim &
+    # ✅ 10. START EMULATOR (FIXED)
+    - name: Start Emulator
+      run: |
+        nohup $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-boot-anim &
         adb wait-for-device
+        echo "Waiting for emulator to boot..."
         until adb shell getprop sys.boot_completed | grep "1"; do sleep 5; done
+        adb shell input keyevent 82
+        adb devices
 
-    - uses: actions/setup-node@v3
+    # =========================
+    # ✅ NODE + APPIUM
+    # =========================
+    - name: Setup Node
+      uses: actions/setup-node@v3
       with:
         node-version: '20'
 
@@ -83,10 +95,22 @@ jobs:
         npm install -g appium
         appium driver install uiautomator2
 
-    - name: Start Appium
+    # ✅ START APPIUM (WITH WAIT)
+    - name: Start Appium Server
       run: |
         nohup appium &
-        sleep 15
+        sleep 20
 
-    - name: Run Mobile tests
-      run: pytest test_framework/tests/mobile
+    # =========================
+    # ✅ INSTALL YOUR APK
+    # =========================
+    - name: Install APK
+      run: |
+        adb install test_framework/apps/app-release-4-3-26.apk
+
+    # =========================
+    # ✅ RUN MOBILE TESTS
+    # =========================
+    - name: Run Mobile Tests
+      run: |
+        pytest test_framework/tests/mobile --alluredir=allure-results
