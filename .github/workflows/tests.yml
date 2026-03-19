@@ -106,7 +106,7 @@ jobs:
     # =========================
     - name: Install APK
       run: |
-        adb install test_framework/apps/app-release-4-3-26.apk
+        adb install tapps/app-release-4-3-26.apk
 
     # =========================
     # ✅ RUN MOBILE TESTS
