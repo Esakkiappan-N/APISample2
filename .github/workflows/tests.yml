@@ -36,7 +36,7 @@ jobs:
     # =========================
     - name: Run API & Web Tests
       run: |
-        pytest test_framework/tests/api test_framework/tests/web --alluredir=allure-results
+        pytest test_framework/tests/api  test_framework/tests/web --alluredir=allure-results
         
  
     # =========================
