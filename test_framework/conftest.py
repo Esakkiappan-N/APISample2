@@ -41,9 +41,6 @@ def page(request):
 
             headless=True,
             args=["--no-sandbox","--disable-dev-shm-usage","--disable-gpu"]
-
-            headless=False,
-            args=["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
         )
 
         context = browser.new_context(viewport={"width": 1920, "height": 1080})
