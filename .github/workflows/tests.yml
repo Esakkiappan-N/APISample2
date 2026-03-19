@@ -1,0 +1,91 @@
+name: Full Test Automation (API + Web + Mobile)
+ 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+ 
+jobs:
+  test:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    # ✅ 1. Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+ 
+    # ✅ 2. Setup Python
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+ 
+    # ✅ 3. Install dependencies
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements.txt
+ 
+    # ✅ 4. Install Browsers (for Web testing)
+    - name: Install Playwright Browsers
+      run: |
+        playwright install --with-deps
+ 
+    # =========================
+    # ✅ API + WEB TESTS
+    # =========================
+    - name: Run API & Web Tests
+      run: |
+        pytest tests/api tests/web --alluredir=allure-results
+ 
+    # =========================
+    # ✅ MOBILE SETUP
+    # =========================
+ 
+    # ✅ 5. Setup Java (Required for Android)
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+ 
+    # ✅ 6. Setup Android SDK
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+ 
+    # ✅ 7. Create Emulator
+    - name: Create Emulator
+      run: |
+        sdkmanager "system-images;android-30;google_apis;x86_64"
+        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+ 
+    # ✅ 8. Start Emulator
+    - name: Start Emulator
+      run: |
+        nohup emulator -avd test -no-window -no-audio -no-boot-anim &
+        adb wait-for-device
+        adb shell input keyevent 82
+        adb devices
+ 
+    # ✅ 9. Setup Node.js
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+ 
+    # ✅ 10. Install Appium
+    - name: Install Appium
+      run: |
+        npm install -g appium
+        appium driver install uiautomator2
+ 
+    # ✅ 11. Start Appium Server
+    - name: Start Appium Server
+      run: |
+        nohup appium &
+ 
+    # =========================
+    # ✅ MOBILE TESTS
+    # =========================
+    - name: Run Mobile Tests
+      run: |
+        pytest tests/mobile --alluredir=allure-results
