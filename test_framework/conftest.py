@@ -38,10 +38,10 @@ def auth_token():
 def page(request):
     with sync_playwright() as p:
         browser = p.chromium.launch(
-<<<<<<< HEAD
+
             headless=True,
             args=["--no-sandbox","--disable-dev-shm-usage","--disable-gpu"]
-=======
+
             headless=False,
             args=["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
         )
@@ -51,7 +51,6 @@ def page(request):
             screenshots=True,
             snapshots=True,
             sources=True
->>>>>>> f7c7b63 (Latest commit)
         )
         context = browser.new_context(
             viewport={"width": 1920, "height": 1080}
