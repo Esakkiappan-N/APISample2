@@ -7,18 +7,18 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted   # ✅ IMPORTANT (not ubuntu-latest)
+    runs-on: self-hosted   # ✅ Must be your local machine
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # ================= PYTHON SETUP =================
+    # ================= PYTHON =================
 
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.13'
+        python-version: '3.12'
 
     - name: Install Python dependencies
       run: |
@@ -27,7 +27,7 @@ jobs:
 
     - name: Install Playwright Browsers
       run: |
-        python -m playwright install --with-deps
+        python -m playwright install
 
     # ================= API + WEB =================
 
@@ -37,24 +37,39 @@ jobs:
 
     # ================= MOBILE SETUP =================
 
+    # ✅ Add platform-tools to PATH
+    - name: Add ADB to PATH
+      run: |
+        echo "${{ github.workspace }}/platform-tools" >> $GITHUB_PATH
+
+    - name: Check ADB Version
+      run: adb version
+
     - name: Check connected devices
       run: |
+        adb kill-server
+        adb start-server
         adb devices
+
+    # ================= NODE + APPIUM =================
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
 
-    - name: Install Appium
+    - name: Install Appium & Driver
       run: |
         npm install -g appium
         appium driver install uiautomator2
+        appium driver list --installed
+
+    # ================= START APPIUM =================
 
     - name: Start Appium Server
       run: |
         nohup appium --log-level info &
-        sleep 15
+        sleep 20
 
     # ================= MOBILE TEST =================
 
