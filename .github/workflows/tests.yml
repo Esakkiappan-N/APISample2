@@ -24,11 +24,12 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install -r test_framework/requirements.txt
+        pip install playwright
  
     # ✅ 4. Install Browsers (for Web testing)
     - name: Install Playwright Browsers
       run: |
-        playwright install --with-deps
+       python -m playwright install --with-deps
  
     # =========================
     # ✅ API + WEB TESTS
