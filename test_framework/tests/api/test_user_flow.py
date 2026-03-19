@@ -9,7 +9,10 @@ def test_user_flow(user):
     login_response = login_api(user["username"], user["password"])
     print("Login Response:", login_response.text)
 
+   if expected_valid:
     assert login_response.status_code == 200
+   else:
+    assert login_response.status_code == 400
 
     token = get_token(login_response)
     print("Token:", token)
@@ -19,4 +22,7 @@ def test_user_flow(user):
     profile_response = get_user_profile(token)
     print("Profile Response:", profile_response.text)
 
-    assert profile_response.status_code == 200
+   if expected_valid:
+    assert login_response.status_code == 200
+  else:
+    assert login_response.status_code == 400
