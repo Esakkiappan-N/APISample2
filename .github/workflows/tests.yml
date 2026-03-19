@@ -23,7 +23,7 @@ jobs:
     # ✅ 3. Install dependencies
     - name: Install Python dependencies
       run: |
-        pip install "test_framework 1"\test_framework\-r requirements.txt
+        pip install "test_framework 1"/test_framework/-r requirements.txt
  
     # ✅ 4. Install Browsers (for Web testing)
     - name: Install Playwright Browsers
