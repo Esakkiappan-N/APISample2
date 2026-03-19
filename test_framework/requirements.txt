@@ -5,3 +5,7 @@ allure-pytest
 requests
 playwright
 pandas
+<<<<<<< HEAD
+=======
+requests
+>>>>>>> f7c7b63 (Latest commit)
