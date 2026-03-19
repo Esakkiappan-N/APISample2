@@ -1,0 +1,2 @@
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Calls_Tab_Clicked_20260318_175334.png
+✅ Clicked Calls tab!

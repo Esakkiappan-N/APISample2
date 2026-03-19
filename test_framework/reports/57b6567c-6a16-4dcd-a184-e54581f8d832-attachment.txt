@@ -1,0 +1,4 @@
+✅ Searched for: >_ M̷u̷k̷u̷n̷d̷a̷n̷
+✅ Opened chat with: >_ M̷u̷k̷u̷n̷d̷a̷n̷
+✅ Found message input using: ('xpath', "//android.widget.EditText[@text='Message']")
+✅ Message sent: Hello, i know u r a MENTAL

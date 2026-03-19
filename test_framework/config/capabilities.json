@@ -1,0 +1,8 @@
+{
+  "platformName": "Android",
+  "deviceName": "0020965BT005049",
+  "automationName": "UiAutomator2",
+  "appPackage": "com.whatsapp",
+  "appActivity": ".Main",
+  "noReset": true
+}

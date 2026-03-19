@@ -1,0 +1,4 @@
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Updates_Tab_Clicked_20260318_123105.png
+✅ Clicked Updates tab!
+✅ Clicked Search icon in Updates!
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Search_Status_FAILED_20260318_123155.png

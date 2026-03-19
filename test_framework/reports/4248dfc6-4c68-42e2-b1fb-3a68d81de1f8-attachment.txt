@@ -1,0 +1,2 @@
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Updates_Tab_Clicked_20260318_131353.png
+✅ Clicked Updates tab!

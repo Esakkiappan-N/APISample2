@@ -1,0 +1,8 @@
+✅ Clicked Chats tab!
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Searched_Praveen_20260318_125958.png
+✅ Searched for: Praveen
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Opened_chat_Praveen_20260318_130001.png
+✅ Opened chat with: Praveen
+✅ Found message input using: ('xpath', "//android.widget.EditText[@text='Message']")
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Message_Sent_20260318_130007.png
+✅ Message sent!

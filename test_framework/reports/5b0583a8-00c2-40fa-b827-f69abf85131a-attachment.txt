@@ -1,0 +1,4 @@
+✅ Searched for: Praveen
+✅ Opened chat with: Praveen
+✅ Found message input using: ('xpath', "//android.widget.EditText[@text='Message']")
+✅ Message sent: Hello! This is an automated message.

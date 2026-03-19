@@ -1,0 +1,1 @@
+{"name": "test_send_message", "status": "passed", "start": 1773811481788, "stop": 1773811489493, "uuid": "44e50017-bad4-4739-a70c-2af18470c90a", "testCaseId": "7fbd477fcfcf40f7707a5fb4c403b454", "fullName": "tests.test_whatspp#test_send_message", "titlePath": ["tests", "test_whatspp.py"]}

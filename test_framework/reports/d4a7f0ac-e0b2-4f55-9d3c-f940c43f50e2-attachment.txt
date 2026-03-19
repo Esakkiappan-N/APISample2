@@ -1,0 +1,3 @@
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Updates_Tab_Clicked_20260318_123336.png
+✅ Clicked Updates tab!
+📸 Screenshot saved: C:\Users\dell\appium\screenshots\Search_Status_FAILED_20260318_123400.png
