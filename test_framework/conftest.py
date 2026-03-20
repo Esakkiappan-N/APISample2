@@ -35,21 +35,38 @@ def auth_token():
 # Web Fixture
 # ─────────────────────────────────────────
 @pytest.fixture(scope="function")
-def page():
+def page(request):
     with sync_playwright() as p:
         browser = p.chromium.launch(
+
             headless=True,
-            args=[
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu"
-            ]
+            args=["--no-sandbox","--disable-dev-shm-usage","--disable-gpu"]
+            headless=False,
+            args=["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
         )
 
-        # ✅ Correct indentation
-        context = browser.new_context()
+        context = browser.new_context(viewport={"width": 1920, "height": 1080})
+        context.tracing.start(
+            screenshots=True,
+            snapshots=True,
+            sources=True
+        )
+        context = browser.new_context(
+            viewport={"width": 1920, "height": 1080}
+        )
         page = context.new_page()
+        page.goto(BASE_URL)
 
         yield page
 
+        test_name = request.node.name
+        trace_dir = "trace-results"
+        os.makedirs(trace_dir, exist_ok=True)
+
+        trace_path = os.path.join(trace_dir, f"{test_name}.zip")
+
+        # ✅ STOP TRACE AND SAVE FILE
+        context.tracing.stop(path=trace_path)
+
+        context.close()
         browser.close()
